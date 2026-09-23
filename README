@@ -1,0 +1,11 @@
+This is a basic project that shows how to contanerize a flask application.
+
+Dockerfile - Here a multistage docker build was used to reduce image.
+
+**NOTE:**
+Flask and similar progreams usually binds to 127.0.0.1. When using docker it is safe practice to add host='0.0.0.0'
+ app.run(debug=True, host='0.0.0.0')
+
+ Requirements.txt - Points to necessary extensions to run our application.
+
+ 
