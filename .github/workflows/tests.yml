@@ -25,6 +25,8 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: basiccalculator:latest
-          format: 'table'
+          scan-type: image
+          format: table
           exit-code: '1'
           ignore-unfixed: true
+          severity: CRITICAL,HIGH
