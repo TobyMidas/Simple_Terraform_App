@@ -1,4 +1,4 @@
-name: Trivy Tests
+name: Build, Scan, and Deploy
 on:
   push:
     branches:
@@ -30,17 +30,45 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: CRITICAL,HIGH
-     
+
+      - name: Configure AWS credentials
+        if: github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        if: github.event_name == 'push'
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Tag and push image to ECR
+        if: github.event_name == 'push'
+        id: push-image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          ECR_REPOSITORY: cb-app-prod
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag basiccalculator:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image_uri=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+
       - name: Setup Terraform
+        if: github.event_name == 'push'
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.7
 
       - name: Terraform Apply
+        if: github.event_name == 'push'
+        working-directory: ./terraform-fargate
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           terraform init
           terraform workspace select prod || terraform workspace new prod
-          terraform apply -auto-approve -var-file=prod.tfvars
+          terraform apply -auto-approve -var-file=prod.tfvars -var="app_image=${{ steps.push-image.outputs.image_uri }}"
