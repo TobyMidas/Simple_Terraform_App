@@ -47,17 +47,3 @@ resource "aws_ecs_service" "main" {
 
     depends_on = [aws_alb_listener.front_end, aws_iam_role_policy_attachment.ecs-task-execution-role-policy-attachment]
 }
-
-resource "aws_iam_role_policy" "secrets_access" {
-  name = "cb-app-secrets-access-${terraform.workspace}"
-  role = aws_iam_role.ecs_task_execution_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = ["secretsmanager:GetSecretValue"]
-      Resource = [aws_secretsmanager_secret.app_secret.arn]
-    }]
-  })
-}

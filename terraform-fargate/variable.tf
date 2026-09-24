@@ -24,10 +24,6 @@ variable "app_image" {
     description = "Docker image to run in the ECS cluster"
 }
 
-variable "app_secret_value" {
-  description = "Secret value for the app (pass via -var or TF_VAR_app_secret_value env var, never commit)"
-  sensitive   = true
-}
 
 variable "app_port" {
     description = "Port exposed by the docker image to redirect traffic to"
