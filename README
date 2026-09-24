@@ -9,6 +9,6 @@ Flask and similar progreams usually binds to 127.0.0.1. When using docker it is 
  Requirements.txt - Points to necessary extensions to run our application.
 
 
-      ## Architecture
+  ## Architecture
 
 ![Architecture diagram](docs/architecture.png)
