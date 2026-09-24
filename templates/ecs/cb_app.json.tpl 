@@ -19,12 +19,6 @@
         "containerPort": ${app_port},
         "hostPort": ${app_port}
       }
-    ],
-    "secrets": [
-      {
-        "name": "APP_SECRET",
-        "valueFrom": "${app_secret_arn}"
-      }
-    ]
+    ],    
   }
 ]

@@ -7,4 +7,4 @@ fargate_memory = 1024
 health_check_path = "/"
 az_count           = 2
 
-alert_email = "your-email@example.com"
+alert_email = "tbnd0023@gmail.com"
